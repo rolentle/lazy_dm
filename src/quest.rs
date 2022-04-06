@@ -7,7 +7,7 @@ const ITEMS: [&str; 20] = ["Coin", "Figurine", "Gemstone", "Amulet", "Earring", 
 
 pub enum ObjectiveConcern {
     Item,
-    // Monument,
+    Monument,
     // NPC
 }
 
@@ -16,27 +16,27 @@ pub const OBJECTIVES: [(&str, Option<ObjectiveConcern>); 20] = [
     ("Find a(n) {{item}}", Some(ObjectiveConcern::Item)), 
     ("Open a gate", None),
     ("Kill a villain", None),
-    ("Activate a monument", None),
+    ("Activate a {{monument}}", Some(ObjectiveConcern::Monument)),
     ("Rescue a(n) NPC", None),
     ("Disable an artifact", None),
     ("Uncover a secret", None),
     ("Recover a(n) {{item}}", Some(ObjectiveConcern::Item)),
     ("Clear out monsters", None),
     ("Convince an NPC", None),
-    ("Protect a monument", None),
+    ("Protect a {{monument}}", Some(ObjectiveConcern::Monument)),
     ("Awaken a monster", None),
     ("Protect an NPC", None),
     ("Put a monster to sleep", None),
     ("Steal a(n) {{item}}", Some(ObjectiveConcern::Item)),
     ("Bury a secret", None),
     ("Return a(n) {{item}}", Some(ObjectiveConcern::Item)),
-    ("Discover a monument", None),
+    ("Discover a {{monument}}", Some(ObjectiveConcern::Monument)),
     ("Close a gate", None),
     ("Dig up an artifact", None)];
 
 const LOCATIONS: [&str; 20] = ["Tower", "Crypts", "Keep", "Cairn", "Giant", "Caves", "Sewers", "Temple", "Mines", "Mansion", "Academy", "Dungeon", "Barrow", "Vault", "Tomb", "Warren", "Ship", "Sanctum", "Cove", "Castle"];
 
-// const MONUMENTS: [&str; 20] = ["Sarcophagus", "Obelisk", "Orb", "Bone pile", "Skull", "Megalith", "Pillars", "Throne", "Statues", "Well", "Orrery", "Effigy", "Arcane circle", "Spire", "Altar", "Pit", "Fountain", "Archway", "Cage", "Brazier"];
+const MONUMENTS: [&str; 20] = ["Sarcophagus", "Obelisk", "Orb", "Bone pile", "Skull", "Megalith", "Pillars", "Throne", "Statues", "Well", "Orrery", "Effigy", "Arcane circle", "Spire", "Altar", "Pit", "Fountain", "Archway", "Cage", "Brazier"];
 
 
 pub struct Quest {
@@ -50,15 +50,16 @@ fn get_objective() -> String {
     let(base_objective, concern) = OBJECTIVES.choose(&mut rng).unwrap();
     match concern {
         Some(concern) => match concern {
-            ObjectiveConcern::Item => reg.render_template(base_objective, &json!({"item": get_item().to_string()})).unwrap(),
+            ObjectiveConcern::Item => reg.render_template(base_objective, &json!({"item": get_choice(&ITEMS).to_string()})).unwrap(),
+            ObjectiveConcern::Monument => reg.render_template(base_objective, &json!({"monument": get_choice(&MONUMENTS).to_string()})).unwrap(),
         }
         None => base_objective.to_string()
     }
 }
 
-fn get_item() -> String {
+fn get_choice(choices: &[&str]) -> String {
     let mut rng = thread_rng();
-    ITEMS.choose(&mut rng).unwrap().to_string()
+    choices.choose(&mut rng).unwrap().to_string()
 }
 
 impl Quest {
